@@ -1,0 +1,235 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Arjun Singh Gangwar | Python Judge</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<div id="main">
+				<div class="inner">
+
+					<header id="header">
+						<a href="index.html" class="logo"><strong>Arjun Singh Gangwar</strong> Python Judge</a>
+						<ul class="icons">
+							<li><a href="#" class="icon brands fa-linkedin"><span class="label">LinkedIn</span></a></li>
+							<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+							<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+						</ul>
+					</header>
+
+					<section id="banner">
+						<div class="content">
+							<header>
+								<h1>Practice Python like a coding platform</h1>
+								<p>Students submit code, the backend runs test cases, and every result is stored for later use.</p>
+							</header>
+							<p>This page is the frontend prototype for a HackerRank-style flow. The actual evaluation happens in the Python backend added to this repo. For now it supports trusted local development, not public internet-safe code execution.</p>
+							<ul class="actions">
+								<li><a href="#submission-form" class="button big">Try A Submission</a></li>
+							</ul>
+						</div>
+						<span class="image object">
+							<img src="images/pic10.jpg" alt="Python coding challenge" />
+						</span>
+					</section>
+
+					<section>
+						<header class="major">
+							<h2>How This Prototype Works</h2>
+						</header>
+						<div class="features">
+							<article>
+								<span class="icon solid fa-keyboard"></span>
+								<div class="content">
+									<h3>Student Submission</h3>
+									<p>The student enters a name, picks a challenge, and writes Python code that implements the required function.</p>
+								</div>
+							</article>
+							<article>
+								<span class="icon solid fa-vial"></span>
+								<div class="content">
+									<h3>Test Case Evaluation</h3>
+									<p>The backend runs the code against test cases with a timeout and returns pass or fail details for each case.</p>
+								</div>
+							</article>
+							<article>
+								<span class="icon solid fa-database"></span>
+								<div class="content">
+									<h3>Submission Storage</h3>
+									<p>Each result is saved into a JSONL file so you can later analyze attempts, accuracy, and student progress.</p>
+								</div>
+							</article>
+							<article>
+								<span class="icon solid fa-cloud"></span>
+								<div class="content">
+									<h3>Future Data Export</h3>
+									<p>You can later sync the saved data to Google Drive, Sheets, or a real database after the judging flow is stable.</p>
+								</div>
+							</article>
+						</div>
+					</section>
+
+					<section>
+						<header class="major">
+							<h2>Sample Challenges</h2>
+						</header>
+						<div class="posts">
+							<article>
+								<h3>Sum Two Numbers</h3>
+								<p>Write a function named <code>solve(a, b)</code> that returns the sum of two integers.</p>
+							</article>
+							<article>
+								<h3>Reverse A String</h3>
+								<p>Write a function named <code>solve(text)</code> that returns the reversed string.</p>
+							</article>
+						</div>
+					</section>
+
+					<section id="submission-form">
+						<header class="major">
+							<h2>Submit Python Code</h2>
+						</header>
+						<form id="judge-form">
+							<div class="row gtr-uniform">
+								<div class="col-6 col-12-xsmall">
+									<input type="text" name="student_name" id="student_name" placeholder="Student name" required />
+								</div>
+								<div class="col-6 col-12-xsmall">
+									<select name="challenge_id" id="challenge_id">
+										<option value="sum-two-numbers">Sum Two Numbers</option>
+										<option value="reverse-string">Reverse A String</option>
+									</select>
+								</div>
+								<div class="col-12">
+									<textarea name="code" id="code" rows="14" placeholder="def solve(a, b):&#10;    return a + b" required></textarea>
+								</div>
+								<div class="col-12">
+									<ul class="actions">
+										<li><button type="submit" class="primary">Run Test Cases</button></li>
+									</ul>
+								</div>
+							</div>
+						</form>
+						<pre id="result-box">Backend not called yet. Start the local API in the backend folder, then submit code here.</pre>
+					</section>
+
+					<section>
+						<header class="major">
+							<h2>Before You Deploy Publicly</h2>
+						</header>
+						<p>Do not expose this prototype directly on the internet yet. Running arbitrary Python from untrusted students requires containers, sandboxing, CPU and memory limits, filesystem isolation, and stronger auth than a local demo backend.</p>
+					</section>
+
+				</div>
+			</div>
+
+			<div id="sidebar">
+				<div class="inner">
+
+					<section id="search" class="alt">
+						<form method="post" action="#">
+							<input type="text" name="query" id="query" placeholder="Search challenges" />
+						</form>
+					</section>
+
+					<nav id="menu">
+						<header class="major">
+							<h2>Menu</h2>
+						</header>
+						<ul>
+							<li><a href="index.html">Home</a></li>
+							<li><a href="generic.html">About and Roadmap</a></li>
+							<li><a href="platform.html">Python Judge</a></li>
+							<li><a href="#">Projects</a></li>
+							<li><a href="#">Blog</a></li>
+							<li><a href="#">Courses</a></li>
+						</ul>
+					</nav>
+
+					<section>
+						<header class="major">
+							<h2>Backend Steps</h2>
+						</header>
+						<div class="mini-posts">
+							<article>
+								<p>1. Install Python dependencies from <code>backend/requirements.txt</code>.</p>
+							</article>
+							<article>
+								<p>2. Run <code>python app.py</code> inside the <code>backend</code> folder.</p>
+							</article>
+							<article>
+								<p>3. Submissions will be stored in <code>backend/data/submissions.jsonl</code>.</p>
+							</article>
+						</div>
+					</section>
+
+					<section>
+						<header class="major">
+							<h2>Get in Touch</h2>
+						</header>
+						<ul class="contact">
+							<li class="icon solid fa-envelope"><a href="mailto:arjungangwar3@gmail.com">arjungangwar3@gmail.com</a></li>
+							<li class="icon brands fa-github"><a href="#">GitHub profile</a></li>
+							<li class="icon brands fa-linkedin"><a href="#">LinkedIn profile</a></li>
+						</ul>
+					</section>
+
+					<footer id="footer">
+						<p class="copyright">&copy; Arjun Singh Gangwar. Built on Editorial by <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+		<script>
+			const form = document.getElementById('judge-form');
+			const resultBox = document.getElementById('result-box');
+
+			form.addEventListener('submit', async function (event) {
+				event.preventDefault();
+
+				const payload = {
+					student_name: document.getElementById('student_name').value,
+					challenge_id: document.getElementById('challenge_id').value,
+					code: document.getElementById('code').value
+				};
+
+				resultBox.textContent = 'Running test cases...';
+
+				try {
+					const response = await fetch('http://127.0.0.1:5000/api/submissions', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(payload)
+					});
+
+					const result = await response.json();
+					resultBox.textContent = JSON.stringify(result, null, 2);
+				} catch (error) {
+					resultBox.textContent = 'Could not reach the backend. Start the Python API from the backend folder first.\n\n' + error;
+				}
+			});
+		</script>
+
+	</body>
+</html>

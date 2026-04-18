@@ -1,0 +1,4 @@
+backend/.judge_tmp/
+backend/__pycache__/
+backend/data/
+*.pyc
