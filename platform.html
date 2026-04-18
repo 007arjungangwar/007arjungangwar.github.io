@@ -6,16 +6,47 @@
 -->
 <html>
 	<head>
-		<title>Arjun Singh Gangwar | Python Judge</title>
+		<title>Arjun Singh Gangwar | Coding Test Platform</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<style>
-			.challenge-card, .stats-card {
+			.hidden {
+				display: none !important;
+			}
+
+			.auth-grid,
+			.exam-grid {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 1.5rem;
+			}
+
+			@media screen and (min-width: 980px) {
+				.auth-grid {
+					grid-template-columns: 1fr 1fr;
+				}
+
+				.exam-grid {
+					grid-template-columns: minmax(320px, 0.95fr) minmax(420px, 1.05fr);
+					align-items: start;
+				}
+			}
+
+			.panel-card {
 				border: solid 1px rgba(210, 215, 217, 0.75);
 				border-radius: 0.375em;
 				padding: 1.5em;
+				background: #fff;
 				margin-bottom: 1.5em;
+			}
+
+			.challenge-card {
+				border: solid 1px rgba(210, 215, 217, 0.75);
+				border-radius: 0.375em;
+				padding: 1.25em;
+				margin-bottom: 1em;
+				cursor: pointer;
 			}
 
 			.challenge-card.active {
@@ -23,9 +54,13 @@
 				box-shadow: 0 0 0 1px rgba(245, 106, 106, 0.2);
 			}
 
-			.status-pill {
+			.muted {
+				color: #7f888f;
+			}
+
+			.status-chip {
 				display: inline-block;
-				padding: 0.2em 0.8em;
+				padding: 0.25em 0.8em;
 				border-radius: 999px;
 				font-size: 0.8em;
 				font-weight: 700;
@@ -33,209 +68,240 @@
 				text-transform: uppercase;
 			}
 
-			.status-pill.accepted {
+			.status-chip.accepted {
 				background: rgba(57, 181, 74, 0.12);
 				color: #2d8a3b;
 			}
 
-			.status-pill.failed {
+			.status-chip.failed {
 				background: rgba(245, 106, 106, 0.12);
-				color: #d14c4c;
+				color: #c24949;
 			}
 
-			.code-box, .result-box {
-				background: #2f3338;
-				color: #f3f4f6;
+			.status-chip.warning {
+				background: rgba(255, 187, 0, 0.14);
+				color: #9e6a00;
+			}
+
+			.exam-shell {
+				min-height: 100vh;
+				background: #f5f6f7;
+			}
+
+			.exam-topbar {
+				position: sticky;
+				top: 0;
+				z-index: 10;
+				background: #1f2328;
+				color: #fff;
+				padding: 1rem 1.5rem;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1rem;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.exam-topbar strong,
+			.exam-topbar span,
+			.exam-topbar button {
+				margin-right: 0.75rem;
+			}
+
+			.editor-textarea,
+			.output-box {
+				width: 100%;
+				min-height: 26rem;
 				border-radius: 0.375em;
-				padding: 1.25em;
+				border: 0;
+				background: #1f2328;
+				color: #f3f4f6;
 				font-family: Consolas, Monaco, monospace;
-				overflow-x: auto;
+				padding: 1.25em;
+				resize: vertical;
 			}
 
-			.history-item {
+			.output-box {
+				min-height: 12rem;
+				white-space: pre-wrap;
+			}
+
+			.test-case {
+				padding: 0.8rem 0;
 				border-top: solid 1px rgba(210, 215, 217, 0.75);
-				padding: 1.25em 0;
 			}
 
-			.history-item:first-child {
+			.test-case:first-child {
+				border-top: 0;
+				padding-top: 0;
+			}
+
+			.history-row {
+				padding: 1rem 0;
+				border-top: solid 1px rgba(210, 215, 217, 0.75);
+			}
+
+			.history-row:first-child {
 				border-top: 0;
 				padding-top: 0;
 			}
 		</style>
 	</head>
 	<body class="is-preload">
-		<div id="wrapper">
-			<div id="main">
-				<div class="inner">
-
-					<header id="header">
-						<a href="index.html" class="logo"><strong>Arjun Singh Gangwar</strong> Python Judge</a>
-						<ul class="icons">
-							<li><a href="#" class="icon brands fa-linkedin"><span class="label">LinkedIn</span></a></li>
-							<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
-							<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-							<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-						</ul>
-					</header>
-
-					<section id="banner">
-						<div class="content">
-							<header>
-								<h1>Python practice platform for students</h1>
-								<p>Students identify themselves, solve challenges, get evaluated automatically, and build a submission history you can analyze later.</p>
+		<div id="platform-app">
+			<div id="auth-view">
+				<div id="wrapper">
+					<div id="main">
+						<div class="inner">
+							<header id="header">
+								<a href="index.html" class="logo"><strong>Arjun Singh Gangwar</strong> Coding Test Platform</a>
 							</header>
-							<p>This page is now a working MVP frontend. Once the Flask backend is running, students can log in with name and email, pick a challenge, submit Python code, and review their previous attempts.</p>
+
+							<section id="banner">
+								<div class="content">
+									<header>
+										<h1>Register, login, and take coding tests</h1>
+										<p>A focused Python test platform for students with autosave, warnings, syntax checking, and stored submission files.</p>
+									</header>
+									<p>This is an exam-style MVP. Students can create an account, login, start a challenge, work in a full-page coding screen, and submit Python solutions that get saved for later review.</p>
+								</div>
+								<span class="image object">
+									<img src="images/pic10.jpg" alt="Coding platform hero" />
+								</span>
+							</section>
+
+							<section>
+								<header class="major">
+									<h2>Start Here</h2>
+								</header>
+								<div class="auth-grid">
+									<div class="panel-card">
+										<h3>Create Account</h3>
+										<form id="register-form">
+											<div class="row gtr-uniform">
+												<div class="col-12">
+													<input type="text" id="register-name" placeholder="Full name" required />
+												</div>
+												<div class="col-12">
+													<input type="email" id="register-email" placeholder="Email" required />
+												</div>
+												<div class="col-12">
+													<input type="password" id="register-password" placeholder="Password (min 6 characters)" required />
+												</div>
+												<div class="col-12">
+													<button type="submit" class="primary fit">Register</button>
+												</div>
+											</div>
+										</form>
+									</div>
+
+									<div class="panel-card">
+										<h3>Login</h3>
+										<form id="login-form">
+											<div class="row gtr-uniform">
+												<div class="col-12">
+													<input type="email" id="login-email" placeholder="Email" required />
+												</div>
+												<div class="col-12">
+													<input type="password" id="login-password" placeholder="Password" required />
+												</div>
+												<div class="col-12">
+													<button type="submit" class="primary fit">Login</button>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+								<p id="auth-message" class="muted">Register or login to access the test screen.</p>
+							</section>
 						</div>
-						<span class="image object">
-							<img src="images/pic10.jpg" alt="Python coding platform" />
-						</span>
-					</section>
+					</div>
 
-					<section>
-						<header class="major">
-							<h2>1. Student Login</h2>
-						</header>
-						<form id="student-form">
-							<div class="row gtr-uniform">
-								<div class="col-5 col-12-xsmall">
-									<input type="text" id="student-name" placeholder="Student name" required />
-								</div>
-								<div class="col-5 col-12-xsmall">
-									<input type="email" id="student-email" placeholder="Student email" required />
-								</div>
-								<div class="col-2 col-12-xsmall">
-									<button type="submit" class="primary fit">Start</button>
-								</div>
-							</div>
-						</form>
-						<p id="student-summary">No student session yet.</p>
-					</section>
+					<div id="sidebar">
+						<div class="inner">
+							<nav id="menu">
+								<header class="major">
+									<h2>Menu</h2>
+								</header>
+								<ul>
+									<li><a href="index.html">Home</a></li>
+									<li><a href="generic.html">About and Roadmap</a></li>
+									<li><a href="platform.html">Coding Test Platform</a></li>
+								</ul>
+							</nav>
 
-					<section>
-						<header class="major">
-							<h2>2. Platform Stats</h2>
-						</header>
-						<div class="row">
-							<div class="col-4 col-12-medium">
-								<div class="stats-card">
-									<h3>Total Submissions</h3>
-									<p id="stat-submissions">0</p>
-								</div>
-							</div>
-							<div class="col-4 col-12-medium">
-								<div class="stats-card">
-									<h3>Accepted Submissions</h3>
-									<p id="stat-accepted">0</p>
-								</div>
-							</div>
-							<div class="col-4 col-12-medium">
-								<div class="stats-card">
-									<h3>Solved Challenges</h3>
-									<p id="stat-solved">0</p>
-								</div>
-							</div>
+							<section>
+								<header class="major">
+									<h2>Important Note</h2>
+								</header>
+								<p>No normal website can guarantee that a student never looks at another device or another machine. What we can do here is create strong deterrents: full-screen prompts, focus-loss warnings, autosave, and detailed session logs.</p>
+							</section>
 						</div>
-					</section>
-
-					<section>
-						<header class="major">
-							<h2>3. Choose A Challenge</h2>
-						</header>
-						<div id="challenge-list" class="posts"></div>
-					</section>
-
-					<section>
-						<header class="major">
-							<h2>4. Write Python Code</h2>
-						</header>
-						<div class="challenge-card">
-							<h3 id="selected-title">Select a challenge</h3>
-							<p id="selected-description">Challenge details will appear here.</p>
-							<p><strong>Expected function:</strong> <span id="selected-function">solve</span></p>
-							<div id="visible-tests"></div>
-						</div>
-						<form id="judge-form">
-							<div class="row gtr-uniform">
-								<div class="col-12">
-									<textarea id="code" rows="16" class="code-box" placeholder="def solve(...):&#10;    pass" required></textarea>
-								</div>
-								<div class="col-12">
-									<ul class="actions">
-										<li><button type="submit" class="primary">Run Test Cases</button></li>
-									</ul>
-								</div>
-							</div>
-						</form>
-						<pre id="result-box" class="result-box">Login, choose a challenge, and submit code to see results here.</pre>
-					</section>
-
-					<section>
-						<header class="major">
-							<h2>5. Submission History</h2>
-						</header>
-						<div id="history-list">
-							<p>No submissions yet.</p>
-						</div>
-					</section>
-
-					<section>
-						<header class="major">
-							<h2>Deployment Note</h2>
-						</header>
-						<p>This frontend can stay on GitHub Pages, but the backend must run on a Python hosting service like Render, Railway, or another server. For a real public judge, code execution must move into isolated containers before you allow untrusted student submissions.</p>
-					</section>
+					</div>
 				</div>
 			</div>
 
-			<div id="sidebar">
-				<div class="inner">
-					<section id="search" class="alt">
-						<form method="post" action="#">
-							<input type="text" placeholder="Search challenges" />
-						</form>
-					</section>
+			<div id="exam-view" class="hidden exam-shell">
+				<div class="exam-topbar">
+					<div>
+						<strong id="student-label">Student</strong>
+						<span id="challenge-label">No challenge selected</span>
+					</div>
+					<div>
+						<span class="status-chip warning">Focus warnings: <span id="focus-warning-count">0</span></span>
+						<span class="status-chip warning">Fullscreen exits: <span id="fullscreen-exit-count">0</span></span>
+						<span class="status-chip warning">Timer: <span id="timer-label">--:--</span></span>
+						<button id="fullscreen-button" class="button small">Enter Full Screen</button>
+						<button id="logout-button" class="button small">Logout</button>
+					</div>
+				</div>
 
-					<nav id="menu">
-						<header class="major">
-							<h2>Menu</h2>
-						</header>
-						<ul>
-							<li><a href="index.html">Home</a></li>
-							<li><a href="generic.html">About and Roadmap</a></li>
-							<li><a href="platform.html">Python Judge</a></li>
-							<li><a href="#">Projects</a></li>
-							<li><a href="#">Blog</a></li>
-							<li><a href="#">Courses</a></li>
-						</ul>
-					</nav>
+				<div style="padding: 1.5rem;">
+					<div class="exam-grid">
+						<div>
+							<div class="panel-card">
+								<h3>Available Tests</h3>
+								<div id="challenge-list"></div>
+							</div>
 
-					<section>
-						<header class="major">
-							<h2>Backend Steps</h2>
-						</header>
-						<div class="mini-posts">
-							<article>
-								<p>1. Install backend packages from <code>backend/requirements.txt</code>.</p>
-							</article>
-							<article>
-								<p>2. Run <code>python app.py</code> inside <code>backend</code>.</p>
-							</article>
-							<article>
-								<p>3. Set <code>window.JUDGE_API_BASE</code> later when you host the backend remotely.</p>
-							</article>
+							<div class="panel-card">
+								<h3>Challenge Details</h3>
+								<h4 id="challenge-title">Select a challenge</h4>
+								<p id="challenge-description" class="muted">Challenge information will appear here.</p>
+								<p><strong>Function:</strong> <span id="challenge-function">solve</span></p>
+								<p><strong>Duration:</strong> <span id="challenge-duration">--</span></p>
+								<div id="visible-tests"></div>
+								<div style="margin-top: 1rem;">
+									<button id="start-test-button" class="primary">Start Test</button>
+								</div>
+							</div>
+
+							<div class="panel-card">
+								<h3>Previous Submissions</h3>
+								<div id="submission-history"><p class="muted">No submissions yet.</p></div>
+							</div>
 						</div>
-					</section>
 
-					<section>
-						<header class="major">
-							<h2>Get in Touch</h2>
-						</header>
-						<ul class="contact">
-							<li class="icon solid fa-envelope"><a href="mailto:arjungangwar3@gmail.com">arjungangwar3@gmail.com</a></li>
-							<li class="icon brands fa-github"><a href="#">GitHub profile</a></li>
-							<li class="icon brands fa-linkedin"><a href="#">LinkedIn profile</a></li>
-						</ul>
-					</section>
+						<div>
+							<div class="panel-card">
+								<h3>Exam Workspace</h3>
+								<p id="session-message" class="muted">Start a test session to unlock coding actions.</p>
+								<textarea id="editor" class="editor-textarea" spellcheck="false" placeholder="Start a test session to begin coding."></textarea>
+								<div style="margin-top: 1rem;">
+									<ul class="actions">
+										<li><button id="check-code-button" class="button">Check Code</button></li>
+										<li><button id="autosave-button" class="button">Save Draft</button></li>
+										<li><button id="submit-code-button" class="primary">Final Submit</button></li>
+									</ul>
+								</div>
+							</div>
+
+							<div class="panel-card">
+								<h3>Output</h3>
+								<pre id="output-box" class="output-box">Syntax checks, runtime errors, and submission results will appear here.</pre>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -247,221 +313,407 @@
 		<script src="assets/js/main.js"></script>
 		<script>
 			const API_BASE = window.JUDGE_API_BASE || 'http://127.0.0.1:5000';
-			const STORAGE_KEY = 'judgeStudentSession';
+			const STORAGE_KEY = 'codingPlatformSession';
 
-			const studentForm = document.getElementById('student-form');
-			const judgeForm = document.getElementById('judge-form');
-			const studentSummary = document.getElementById('student-summary');
-			const resultBox = document.getElementById('result-box');
+			const authView = document.getElementById('auth-view');
+			const examView = document.getElementById('exam-view');
+			const authMessage = document.getElementById('auth-message');
+			const registerForm = document.getElementById('register-form');
+			const loginForm = document.getElementById('login-form');
+			const studentLabel = document.getElementById('student-label');
+			const challengeLabel = document.getElementById('challenge-label');
 			const challengeList = document.getElementById('challenge-list');
-			const historyList = document.getElementById('history-list');
+			const challengeTitle = document.getElementById('challenge-title');
+			const challengeDescription = document.getElementById('challenge-description');
+			const challengeFunction = document.getElementById('challenge-function');
+			const challengeDuration = document.getElementById('challenge-duration');
 			const visibleTests = document.getElementById('visible-tests');
+			const submissionHistory = document.getElementById('submission-history');
+			const sessionMessage = document.getElementById('session-message');
+			const editor = document.getElementById('editor');
+			const outputBox = document.getElementById('output-box');
+			const focusWarningCount = document.getElementById('focus-warning-count');
+			const fullscreenExitCount = document.getElementById('fullscreen-exit-count');
+			const timerLabel = document.getElementById('timer-label');
+			const startTestButton = document.getElementById('start-test-button');
+			const checkCodeButton = document.getElementById('check-code-button');
+			const autosaveButton = document.getElementById('autosave-button');
+			const submitCodeButton = document.getElementById('submit-code-button');
+			const fullscreenButton = document.getElementById('fullscreen-button');
+			const logoutButton = document.getElementById('logout-button');
 
-			const selectedTitle = document.getElementById('selected-title');
-			const selectedDescription = document.getElementById('selected-description');
-			const selectedFunction = document.getElementById('selected-function');
-			const codeBox = document.getElementById('code');
-
-			const statSubmissions = document.getElementById('stat-submissions');
-			const statAccepted = document.getElementById('stat-accepted');
-			const statSolved = document.getElementById('stat-solved');
-
+			let sessionState = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
 			let challenges = [];
 			let selectedChallenge = null;
-			let currentStudent = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+			let activeTestSession = null;
+			let timerInterval = null;
 
-			function setStats(stats) {
-				statSubmissions.textContent = stats ? stats.total_submissions : '0';
-				statAccepted.textContent = stats ? stats.accepted_submissions : '0';
-				statSolved.textContent = stats ? stats.solved_challenges : '0';
+			function setAuthView(authorized) {
+				authView.classList.toggle('hidden', authorized);
+				examView.classList.toggle('hidden', !authorized);
 			}
 
-			function setStudentSummary() {
-				if (!currentStudent) {
-					studentSummary.textContent = 'No student session yet.';
-					setStats(null);
+			function authHeaders() {
+				return {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer ' + sessionState.token
+				};
+			}
+
+			function saveState() {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionState));
+			}
+
+			function clearState() {
+				sessionState = null;
+				activeTestSession = null;
+				localStorage.removeItem(STORAGE_KEY);
+				setAuthView(false);
+			}
+
+			function updateCounters() {
+				focusWarningCount.textContent = activeTestSession ? activeTestSession.focus_warnings : '0';
+				fullscreenExitCount.textContent = activeTestSession ? activeTestSession.fullscreen_exits : '0';
+			}
+
+			function renderHistory(history) {
+				if (!history || !history.length) {
+					submissionHistory.innerHTML = '<p class="muted">No submissions yet.</p>';
 					return;
 				}
 
-				studentSummary.textContent = 'Logged in as ' + currentStudent.student.name + ' (' + currentStudent.student.email + ')';
-				setStats(currentStudent.stats);
+				submissionHistory.innerHTML = history.map(function (item) {
+					return '<div class="history-row">' +
+						'<h4>' + item.challenge_id + '</h4>' +
+						'<p><span class="status-chip ' + item.status + '">' + item.status + '</span></p>' +
+						'<p>Passed ' + item.passed_tests + ' / ' + item.total_tests + ' tests</p>' +
+						'<p class="muted">' + item.submitted_at + '</p>' +
+						'</div>';
+				}).join('');
 			}
 
 			function renderVisibleTests(tests) {
-				visibleTests.innerHTML = '<h4>Visible test cases</h4>';
-				tests.forEach(function (test, index) {
-					const block = document.createElement('div');
-					block.className = 'challenge-card';
-					block.innerHTML = '<strong>Test ' + (index + 1) + '</strong><br>Input: <code>' +
+				if (!tests || !tests.length) {
+					visibleTests.innerHTML = '';
+					return;
+				}
+				visibleTests.innerHTML = '<h4>Visible Test Cases</h4>' + tests.map(function (test, index) {
+					return '<div class="test-case"><strong>Case ' + (index + 1) + '</strong><br>Input: <code>' +
 						JSON.stringify(test.input) + '</code><br>Expected: <code>' +
-						JSON.stringify(test.expected) + '</code>';
-					visibleTests.appendChild(block);
-				});
+						JSON.stringify(test.expected) + '</code></div>';
+				}).join('');
 			}
 
 			function renderChallenges() {
 				challengeList.innerHTML = '';
 				challenges.forEach(function (challenge) {
-					const article = document.createElement('article');
-					article.className = 'challenge-card' + (selectedChallenge && selectedChallenge.id === challenge.id ? ' active' : '');
-					article.innerHTML = '<h3>' + challenge.title + '</h3>' +
+					const card = document.createElement('div');
+					card.className = 'challenge-card' + (selectedChallenge && selectedChallenge.id === challenge.id ? ' active' : '');
+					card.innerHTML = '<h4>' + challenge.title + '</h4>' +
 						'<p>' + challenge.description + '</p>' +
-						'<p><strong>Function:</strong> <code>' + challenge.function_name + '</code></p>' +
-						'<ul class="actions"><li><button class="button">Solve</button></li></ul>';
-					article.querySelector('button').addEventListener('click', function () {
+						'<p class="muted">Duration: ' + challenge.duration_minutes + ' minutes</p>';
+					card.addEventListener('click', function () {
 						selectChallenge(challenge.id);
 					});
-					challengeList.appendChild(article);
+					challengeList.appendChild(card);
 				});
 			}
 
 			function selectChallenge(challengeId) {
-				selectedChallenge = challenges.find(function (item) {
-					return item.id === challengeId;
-				});
+				selectedChallenge = challenges.find(function (challenge) {
+					return challenge.id === challengeId;
+				}) || null;
 
 				if (!selectedChallenge) {
 					return;
 				}
 
-				selectedTitle.textContent = selectedChallenge.title;
-				selectedDescription.textContent = selectedChallenge.description;
-				selectedFunction.textContent = selectedChallenge.function_name;
-				codeBox.value = selectedChallenge.starter_code;
+				challengeTitle.textContent = selectedChallenge.title;
+				challengeDescription.textContent = selectedChallenge.description;
+				challengeFunction.textContent = selectedChallenge.function_name;
+				challengeDuration.textContent = selectedChallenge.duration_minutes + ' minutes';
+				challengeLabel.textContent = selectedChallenge.title;
 				renderVisibleTests(selectedChallenge.visible_tests);
 				renderChallenges();
 			}
 
-			function renderHistory(submissions) {
-				if (!submissions.length) {
-					historyList.innerHTML = '<p>No submissions yet.</p>';
-					return;
-				}
-
-				historyList.innerHTML = submissions.map(function (item) {
-					return '<div class="history-item">' +
-						'<h3>' + item.challenge_id + '</h3>' +
-						'<p><span class="status-pill ' + item.status + '">' + item.status + '</span></p>' +
-						'<p>Passed ' + item.passed_tests + ' of ' + item.total_tests + ' tests.</p>' +
-						'<p>Submitted at: ' + item.submitted_at + '</p>' +
-						'</div>';
-				}).join('');
+			function showOutput(data) {
+				outputBox.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
 			}
 
-			async function loadChallenges() {
-				const response = await fetch(API_BASE + '/api/challenges');
-				challenges = await response.json();
+			function startTimer(startedAt, durationMinutes) {
+				clearInterval(timerInterval);
+				const started = new Date(startedAt).getTime();
+				const deadline = started + (durationMinutes * 60 * 1000);
+
+				function renderTime() {
+					const diff = Math.max(0, deadline - Date.now());
+					const mins = String(Math.floor(diff / 60000)).padStart(2, '0');
+					const secs = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+					timerLabel.textContent = mins + ':' + secs;
+				}
+
+				renderTime();
+				timerInterval = setInterval(renderTime, 1000);
+			}
+
+			async function loadAuthorizedData() {
+				const meResponse = await fetch(API_BASE + '/api/auth/me', {
+					headers: { 'Authorization': 'Bearer ' + sessionState.token }
+				});
+				if (!meResponse.ok) {
+					clearState();
+					return;
+				}
+				const me = await meResponse.json();
+				sessionState.student = me.student;
+				saveState();
+				studentLabel.textContent = me.student.name + ' (' + me.student.email + ')';
+				renderHistory(me.submissions);
+
+				const challengesResponse = await fetch(API_BASE + '/api/challenges', {
+					headers: { 'Authorization': 'Bearer ' + sessionState.token }
+				});
+				challenges = await challengesResponse.json();
 				renderChallenges();
 				if (!selectedChallenge && challenges.length) {
 					selectChallenge(challenges[0].id);
 				}
+				setAuthView(true);
 			}
 
-			async function loadStudentSession() {
-				if (!currentStudent) {
-					setStudentSummary();
+			function currentSessionPayload() {
+				return {
+					code: editor.value,
+					focus_warnings: activeTestSession ? activeTestSession.focus_warnings : 0,
+					fullscreen_exits: activeTestSession ? activeTestSession.fullscreen_exits : 0
+				};
+			}
+
+			async function autosaveCurrentSession() {
+				if (!activeTestSession) {
 					return;
 				}
-
-				try {
-					const response = await fetch(API_BASE + '/api/students/' + currentStudent.student.id + '/submissions');
-					if (!response.ok) {
-						throw new Error('Student session not found');
-					}
-					const payload = await response.json();
-					currentStudent = {
-						student: payload.student,
-						stats: payload.stats
-					};
-					localStorage.setItem(STORAGE_KEY, JSON.stringify(currentStudent));
-					setStudentSummary();
-					renderHistory(payload.submissions);
-				} catch (error) {
-					currentStudent = null;
-					localStorage.removeItem(STORAGE_KEY);
-					setStudentSummary();
-					historyList.innerHTML = '<p>Could not restore previous session.</p>';
+				const response = await fetch(API_BASE + '/api/test-sessions/' + activeTestSession.id + '/autosave', {
+					method: 'POST',
+					headers: authHeaders(),
+					body: JSON.stringify(currentSessionPayload())
+				});
+				if (response.ok) {
+					const result = await response.json();
+					activeTestSession = result.session;
+					updateCounters();
 				}
 			}
 
-			studentForm.addEventListener('submit', async function (event) {
-				event.preventDefault();
+			async function enterFullscreenIfPossible() {
+				const root = document.documentElement;
+				if (!document.fullscreenElement && root.requestFullscreen) {
+					try {
+						await root.requestFullscreen();
+					} catch (error) {
+						showOutput('Fullscreen request was blocked by the browser. The student can continue, but this should be treated as a warning-managed attempt.');
+					}
+				}
+			}
 
+			registerForm.addEventListener('submit', async function (event) {
+				event.preventDefault();
 				const payload = {
-					name: document.getElementById('student-name').value.trim(),
-					email: document.getElementById('student-email').value.trim()
+					name: document.getElementById('register-name').value.trim(),
+					email: document.getElementById('register-email').value.trim(),
+					password: document.getElementById('register-password').value
 				};
 
-				const response = await fetch(API_BASE + '/api/students/login', {
+				const response = await fetch(API_BASE + '/api/auth/register', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(payload)
 				});
-
 				const result = await response.json();
 				if (!response.ok) {
-					studentSummary.textContent = result.error || 'Could not create session.';
+					authMessage.textContent = result.error || 'Registration failed.';
 					return;
 				}
-
-				currentStudent = result;
-				localStorage.setItem(STORAGE_KEY, JSON.stringify(currentStudent));
-				setStudentSummary();
-				renderHistory([]);
-				resultBox.textContent = 'Student session started successfully.';
+				sessionState = { token: result.token, student: result.student };
+				saveState();
+				authMessage.textContent = 'Registration successful.';
+				await loadAuthorizedData();
 			});
 
-			judgeForm.addEventListener('submit', async function (event) {
+			loginForm.addEventListener('submit', async function (event) {
 				event.preventDefault();
+				const payload = {
+					email: document.getElementById('login-email').value.trim(),
+					password: document.getElementById('login-password').value
+				};
 
-				if (!currentStudent) {
-					resultBox.textContent = 'Please login before submitting code.';
+				const response = await fetch(API_BASE + '/api/auth/login', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(payload)
+				});
+				const result = await response.json();
+				if (!response.ok) {
+					authMessage.textContent = result.error || 'Login failed.';
 					return;
 				}
+				sessionState = { token: result.token, student: result.student };
+				saveState();
+				await loadAuthorizedData();
+			});
 
+			startTestButton.addEventListener('click', async function () {
 				if (!selectedChallenge) {
-					resultBox.textContent = 'Please choose a challenge first.';
+					showOutput('Please select a challenge first.');
 					return;
 				}
 
-				resultBox.textContent = 'Running test cases...';
+				const response = await fetch(API_BASE + '/api/test-sessions', {
+					method: 'POST',
+					headers: authHeaders(),
+					body: JSON.stringify({ challenge_id: selectedChallenge.id })
+				});
+				const result = await response.json();
+				if (!response.ok) {
+					showOutput(result.error || 'Could not start test session.');
+					return;
+				}
 
-				try {
-					const response = await fetch(API_BASE + '/api/submissions', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({
-							student_id: currentStudent.student.id,
-							challenge_id: selectedChallenge.id,
-							code: codeBox.value
-						})
-					});
-					const result = await response.json();
+				activeTestSession = result.session;
+				editor.value = result.challenge.starter_code;
+				sessionMessage.textContent = 'Test session started. Stay focused on this page. Autosave is active.';
+				updateCounters();
+				startTimer(activeTestSession.started_at, result.challenge.duration_minutes);
+				await enterFullscreenIfPossible();
+				showOutput('Test session started. You can now check code, save draft, or submit.');
+			});
 
-					if (!response.ok) {
-						resultBox.textContent = result.error || 'Submission failed.';
-						return;
-					}
+			checkCodeButton.addEventListener('click', async function () {
+				if (!activeTestSession || !selectedChallenge) {
+					showOutput('Start a test session first.');
+					return;
+				}
+				const response = await fetch(API_BASE + '/api/code/check', {
+					method: 'POST',
+					headers: authHeaders(),
+					body: JSON.stringify({
+						challenge_id: selectedChallenge.id,
+						code: editor.value
+					})
+				});
+				const result = await response.json();
+				showOutput(result);
+			});
 
-					currentStudent.stats = result.stats;
-					localStorage.setItem(STORAGE_KEY, JSON.stringify(currentStudent));
-					setStudentSummary();
-					resultBox.textContent = JSON.stringify(result.submission, null, 2);
+			autosaveButton.addEventListener('click', async function () {
+				if (!activeTestSession) {
+					showOutput('Start a test session first.');
+					return;
+				}
+				await autosaveCurrentSession();
+				showOutput('Draft saved successfully.');
+			});
 
-					const submissionsResponse = await fetch(API_BASE + '/api/students/' + currentStudent.student.id + '/submissions');
-					const submissionsPayload = await submissionsResponse.json();
-					renderHistory(submissionsPayload.submissions);
-				} catch (error) {
-					resultBox.textContent = 'Could not reach backend at ' + API_BASE + '. Start or deploy the Flask API first.\n\n' + error;
+			submitCodeButton.addEventListener('click', async function () {
+				if (!activeTestSession || !selectedChallenge) {
+					showOutput('Start a test session first.');
+					return;
+				}
+
+				const response = await fetch(API_BASE + '/api/submissions', {
+					method: 'POST',
+					headers: authHeaders(),
+					body: JSON.stringify({
+						test_session_id: activeTestSession.id,
+						challenge_id: selectedChallenge.id,
+						code: editor.value,
+						focus_warnings: activeTestSession.focus_warnings,
+						fullscreen_exits: activeTestSession.fullscreen_exits
+					})
+				});
+				const result = await response.json();
+				if (!response.ok) {
+					showOutput(result.error || 'Submission failed.');
+					return;
+				}
+
+				activeTestSession = result.session;
+				updateCounters();
+				renderHistory(result.history);
+				showOutput(result.submission);
+			});
+
+			fullscreenButton.addEventListener('click', async function () {
+				await enterFullscreenIfPossible();
+			});
+
+			logoutButton.addEventListener('click', function () {
+				clearInterval(timerInterval);
+				clearState();
+			});
+
+			document.addEventListener('visibilitychange', function () {
+				if (!activeTestSession) {
+					return;
+				}
+				if (document.hidden) {
+					activeTestSession.focus_warnings += 1;
+					updateCounters();
+					showOutput('Warning: tab switch detected. This has been recorded.');
+					autosaveCurrentSession();
 				}
 			});
+
+			window.addEventListener('blur', function () {
+				if (!activeTestSession) {
+					return;
+				}
+				activeTestSession.focus_warnings += 1;
+				updateCounters();
+				autosaveCurrentSession();
+			});
+
+			document.addEventListener('fullscreenchange', function () {
+				if (!activeTestSession) {
+					return;
+				}
+				if (!document.fullscreenElement) {
+					activeTestSession.fullscreen_exits += 1;
+					updateCounters();
+					showOutput('Fullscreen exit detected. This has been recorded.');
+					autosaveCurrentSession();
+				}
+			});
+
+			editor.addEventListener('copy', function (event) {
+				event.preventDefault();
+				showOutput('Copy is disabled in exam mode.');
+			});
+
+			editor.addEventListener('paste', function (event) {
+				event.preventDefault();
+				showOutput('Paste is disabled in exam mode.');
+			});
+
+			editor.addEventListener('contextmenu', function (event) {
+				event.preventDefault();
+			});
+
+			setInterval(function () {
+				autosaveCurrentSession();
+			}, 30000);
 
 			(async function init() {
+				if (!sessionState || !sessionState.token) {
+					setAuthView(false);
+					return;
+				}
 				try {
-					await loadChallenges();
-					await loadStudentSession();
+					await loadAuthorizedData();
 				} catch (error) {
-					resultBox.textContent = 'Platform could not load data from backend.\n\n' + error;
+					clearState();
+					authMessage.textContent = 'Could not restore session. Please login again.';
 				}
 			})();
 		</script>

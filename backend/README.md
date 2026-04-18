@@ -1,20 +1,23 @@
 # Python Judge Backend Prototype
 
-This backend is a starter for a HackerRank-like Python practice platform.
+This backend is a starter for a HackerRank-like Python test platform with registration, login, exam sessions, autosave, and stored submission files.
 
 ## What it does
 
-- creates or restores student sessions with name and email
-- serves challenge metadata to the frontend
-- accepts student submissions through `POST /api/submissions`
-- runs basic Python function challenges against test cases
-- stores students and submissions in `backend/data/judge.db`
+- supports registration and login with email and password
+- issues auth tokens for the frontend
+- creates coding test sessions per student
+- autosaves current code and warning counters
+- validates code to surface syntax and runtime issues
+- evaluates final submissions against visible and hidden test cases
+- stores students, sessions, and submissions in `backend/data/judge.db`
+- archives each final Python file in `backend/data/code_archive/`
 
 ## Important warning
 
-This is a local prototype for trusted development only.
+This is still not production-safe internet code execution.
 
-It is **not** safe to expose arbitrary code execution directly to the internet. For a real student platform, run code inside isolated containers with strict CPU, memory, network, and filesystem limits.
+It adds stronger exam-style workflow controls, but it does **not** fully prevent cheating. A browser app cannot guarantee that a student is not using another device, VM, or second screen. For real high-stakes assessments, use containerized execution, proctoring policy, and stronger identity checks.
 
 ## Quick start
 
@@ -31,16 +34,43 @@ pip install -r requirements.txt
 python app.py
 ```
 
-4. Open `platform.html` in the site and submit code from the form.
+4. Open `platform.html` in the site and register/login.
 
 ## API shape
 
-`POST /api/students/login`
+`POST /api/auth/register`
 
 ```json
 {
   "name": "Arjun",
-  "email": "arjun@example.com"
+  "email": "arjun@example.com",
+  "password": "secret123"
+}
+```
+
+`POST /api/auth/login`
+
+```json
+{
+  "email": "arjun@example.com",
+  "password": "secret123"
+}
+```
+
+`POST /api/test-sessions`
+
+```json
+{
+  "challenge_id": "sum-two-numbers"
+}
+```
+
+`POST /api/code/check`
+
+```json
+{
+  "challenge_id": "sum-two-numbers",
+  "code": "def solve(a, b):\n    return a + b"
 }
 ```
 
@@ -48,18 +78,21 @@ python app.py
 
 ```json
 {
-  "student_id": 1,
+  "test_session_id": 1,
   "challenge_id": "sum-two-numbers",
-  "code": "def solve(a, b):\n    return a + b"
+  "code": "def solve(a, b):\n    return a + b",
+  "focus_warnings": 1,
+  "fullscreen_exits": 0
 }
 ```
 
 ## Storage options from here
 
 - Keep using SQLite for the MVP.
+- Use `backend/data/code_archive/` when you want the raw Python files students submitted.
 - Export `judge.db` data or sync it into Google Drive manually or with a small script.
-- Upgrade later to SQLite, PostgreSQL, or Google Sheets depending on the scale.
+- Upgrade later to PostgreSQL or a managed database if the number of students grows.
 
 ## Recommended next step
 
-Once the product flow feels right, move execution into Docker containers and store metadata in a proper database.
+Once the product flow feels right, host the Flask API on a Python service and move execution into Docker containers before treating this as a real public exam system.
