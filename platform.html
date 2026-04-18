@@ -15,7 +15,6 @@
 				display: none !important;
 			}
 
-			.auth-grid,
 			.exam-grid {
 				display: grid;
 				grid-template-columns: 1fr;
@@ -23,14 +22,42 @@
 			}
 
 			@media screen and (min-width: 980px) {
-				.auth-grid {
-					grid-template-columns: 1fr 1fr;
-				}
-
 				.exam-grid {
 					grid-template-columns: minmax(320px, 0.95fr) minmax(420px, 1.05fr);
 					align-items: start;
 				}
+			}
+
+			.auth-shell {
+				max-width: 38rem;
+			}
+
+			.auth-switch {
+				display: flex;
+				gap: 0.75rem;
+				margin-bottom: 1rem;
+				flex-wrap: wrap;
+			}
+
+			.notice-box {
+				border-radius: 0.375em;
+				padding: 1rem 1.25rem;
+				margin-top: 1rem;
+			}
+
+			.notice-box.info {
+				background: rgba(91, 192, 222, 0.1);
+				color: #2f6f86;
+			}
+
+			.notice-box.success {
+				background: rgba(57, 181, 74, 0.12);
+				color: #2d8a3b;
+			}
+
+			.notice-box.error {
+				background: rgba(245, 106, 106, 0.12);
+				color: #c24949;
 			}
 
 			.panel-card {
@@ -174,8 +201,18 @@
 								<header class="major">
 									<h2>Start Here</h2>
 								</header>
-								<div class="auth-grid">
+								<div class="auth-shell">
 									<div class="panel-card">
+										<div class="auth-switch">
+											<button id="show-login-button" class="button small primary" type="button">Login</button>
+											<button id="show-register-button" class="button small" type="button">Create Account</button>
+										</div>
+
+										<div id="backend-status" class="notice-box info">
+											The frontend is ready. Registration and login will only work after the backend API is connected.
+										</div>
+
+										<div id="register-panel" class="hidden">
 										<h3>Create Account</h3>
 										<form id="register-form">
 											<div class="row gtr-uniform">
@@ -193,9 +230,9 @@
 												</div>
 											</div>
 										</form>
-									</div>
+										</div>
 
-									<div class="panel-card">
+										<div id="login-panel">
 										<h3>Login</h3>
 										<form id="login-form">
 											<div class="row gtr-uniform">
@@ -210,9 +247,10 @@
 												</div>
 											</div>
 										</form>
+										</div>
 									</div>
 								</div>
-								<p id="auth-message" class="muted">Register or login to access the test screen.</p>
+								<div id="auth-message" class="notice-box info">Login to access the test screen.</div>
 							</section>
 						</div>
 					</div>
@@ -319,8 +357,13 @@
 			const authView = document.getElementById('auth-view');
 			const examView = document.getElementById('exam-view');
 			const authMessage = document.getElementById('auth-message');
+			const backendStatus = document.getElementById('backend-status');
 			const registerForm = document.getElementById('register-form');
 			const loginForm = document.getElementById('login-form');
+			const registerPanel = document.getElementById('register-panel');
+			const loginPanel = document.getElementById('login-panel');
+			const showLoginButton = document.getElementById('show-login-button');
+			const showRegisterButton = document.getElementById('show-register-button');
 			const studentLabel = document.getElementById('student-label');
 			const challengeLabel = document.getElementById('challenge-label');
 			const challengeList = document.getElementById('challenge-list');
@@ -348,10 +391,30 @@
 			let selectedChallenge = null;
 			let activeTestSession = null;
 			let timerInterval = null;
+			let authMode = 'login';
 
 			function setAuthView(authorized) {
 				authView.classList.toggle('hidden', authorized);
 				examView.classList.toggle('hidden', !authorized);
+			}
+
+			function setAuthMode(mode) {
+				authMode = mode;
+				const isLogin = mode === 'login';
+				loginPanel.classList.toggle('hidden', !isLogin);
+				registerPanel.classList.toggle('hidden', isLogin);
+				showLoginButton.classList.toggle('primary', isLogin);
+				showRegisterButton.classList.toggle('primary', !isLogin);
+			}
+
+			function setAuthNotice(message, kind) {
+				authMessage.className = 'notice-box ' + kind;
+				authMessage.textContent = message;
+			}
+
+			function setBackendNotice(message, kind) {
+				backendStatus.className = 'notice-box ' + kind;
+				backendStatus.textContent = message;
 			}
 
 			function authHeaders() {
@@ -370,6 +433,7 @@
 				activeTestSession = null;
 				localStorage.removeItem(STORAGE_KEY);
 				setAuthView(false);
+				setAuthMode('login');
 			}
 
 			function updateCounters() {
@@ -483,6 +547,26 @@
 				setAuthView(true);
 			}
 
+			async function pingBackend() {
+				try {
+					const response = await fetch(API_BASE + '/api/health');
+					if (response.ok) {
+						setBackendNotice('Backend connected. Registration and login are available.', 'success');
+						return true;
+					}
+				} catch (error) {
+					// handled below
+				}
+
+				const isLocalApi = API_BASE.indexOf('127.0.0.1') !== -1 || API_BASE.indexOf('localhost') !== -1;
+				if (isLocalApi && window.location.hostname.indexOf('github.io') !== -1) {
+					setBackendNotice('The live site is still pointing to a local backend. Until the backend is hosted, register/login will not work on GitHub Pages.', 'error');
+				} else {
+					setBackendNotice('Backend is not reachable right now. Check the API URL or start the Flask server.', 'error');
+				}
+				return false;
+			}
+
 			function currentSessionPayload() {
 				return {
 					code: editor.value,
@@ -526,20 +610,24 @@
 					password: document.getElementById('register-password').value
 				};
 
-				const response = await fetch(API_BASE + '/api/auth/register', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(payload)
-				});
-				const result = await response.json();
-				if (!response.ok) {
-					authMessage.textContent = result.error || 'Registration failed.';
-					return;
+				try {
+					const response = await fetch(API_BASE + '/api/auth/register', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(payload)
+					});
+					const result = await response.json();
+					if (!response.ok) {
+						setAuthNotice(result.error || 'Registration failed.', 'error');
+						return;
+					}
+					document.getElementById('login-email').value = payload.email;
+					document.getElementById('login-password').value = payload.password;
+					setAuthMode('login');
+					setAuthNotice('Registration successful. Please click Login to enter the test platform.', 'success');
+				} catch (error) {
+					setAuthNotice('Registration could not reach the backend. Make sure the API is running and connected.', 'error');
 				}
-				sessionState = { token: result.token, student: result.student };
-				saveState();
-				authMessage.textContent = 'Registration successful.';
-				await loadAuthorizedData();
 			});
 
 			loginForm.addEventListener('submit', async function (event) {
@@ -549,19 +637,24 @@
 					password: document.getElementById('login-password').value
 				};
 
-				const response = await fetch(API_BASE + '/api/auth/login', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(payload)
-				});
-				const result = await response.json();
-				if (!response.ok) {
-					authMessage.textContent = result.error || 'Login failed.';
-					return;
+				try {
+					const response = await fetch(API_BASE + '/api/auth/login', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(payload)
+					});
+					const result = await response.json();
+					if (!response.ok) {
+						setAuthNotice(result.error || 'Login failed.', 'error');
+						return;
+					}
+					sessionState = { token: result.token, student: result.student };
+					saveState();
+					setAuthNotice('Login successful.', 'success');
+					await loadAuthorizedData();
+				} catch (error) {
+					setAuthNotice('Login could not reach the backend. Make sure the API is running and connected.', 'error');
 				}
-				sessionState = { token: result.token, student: result.student };
-				saveState();
-				await loadAuthorizedData();
 			});
 
 			startTestButton.addEventListener('click', async function () {
@@ -649,6 +742,16 @@
 				await enterFullscreenIfPossible();
 			});
 
+			showLoginButton.addEventListener('click', function () {
+				setAuthMode('login');
+				setAuthNotice('Login to access the test screen.', 'info');
+			});
+
+			showRegisterButton.addEventListener('click', function () {
+				setAuthMode('register');
+				setAuthNotice('Create an account first, then login to continue.', 'info');
+			});
+
 			logoutButton.addEventListener('click', function () {
 				clearInterval(timerInterval);
 				clearState();
@@ -706,6 +809,8 @@
 			}, 30000);
 
 			(async function init() {
+				setAuthMode('login');
+				await pingBackend();
 				if (!sessionState || !sessionState.token) {
 					setAuthView(false);
 					return;
@@ -714,7 +819,7 @@
 					await loadAuthorizedData();
 				} catch (error) {
 					clearState();
-					authMessage.textContent = 'Could not restore session. Please login again.';
+					setAuthNotice('Could not restore session. Please login again.', 'error');
 				}
 			})();
 		</script>
