@@ -4,9 +4,11 @@ This backend is a starter for a HackerRank-like Python practice platform.
 
 ## What it does
 
+- creates or restores student sessions with name and email
+- serves challenge metadata to the frontend
 - accepts student submissions through `POST /api/submissions`
 - runs basic Python function challenges against test cases
-- stores each attempt in `backend/data/submissions.jsonl`
+- stores students and submissions in `backend/data/judge.db`
 
 ## Important warning
 
@@ -33,11 +35,20 @@ python app.py
 
 ## API shape
 
+`POST /api/students/login`
+
+```json
+{
+  "name": "Arjun",
+  "email": "arjun@example.com"
+}
+```
+
 `POST /api/submissions`
 
 ```json
 {
-  "student_name": "Arjun",
+  "student_id": 1,
   "challenge_id": "sum-two-numbers",
   "code": "def solve(a, b):\n    return a + b"
 }
@@ -45,8 +56,8 @@ python app.py
 
 ## Storage options from here
 
-- Keep using `submissions.jsonl` for early prototypes.
-- Sync that file into Google Drive manually or with a small script.
+- Keep using SQLite for the MVP.
+- Export `judge.db` data or sync it into Google Drive manually or with a small script.
 - Upgrade later to SQLite, PostgreSQL, or Google Sheets depending on the scale.
 
 ## Recommended next step

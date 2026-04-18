@@ -1,8 +1,8 @@
 import json
 import subprocess
 import sys
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 
 CHALLENGES = {
@@ -10,20 +10,42 @@ CHALLENGES = {
         "title": "Sum Two Numbers",
         "description": "Write solve(a, b) and return the sum of both integers.",
         "function_name": "solve",
-        "tests": [
+        "starter_code": "def solve(a, b):\n    # return the sum of a and b\n    pass\n",
+        "visible_tests": [
             {"input": [1, 2], "expected": 3},
             {"input": [-5, 9], "expected": 4},
+        ],
+        "hidden_tests": [
             {"input": [100, 250], "expected": 350},
+            {"input": [0, 0], "expected": 0},
         ],
     },
     "reverse-string": {
         "title": "Reverse A String",
         "description": "Write solve(text) and return the reversed string.",
         "function_name": "solve",
-        "tests": [
+        "starter_code": "def solve(text):\n    # return the reversed string\n    pass\n",
+        "visible_tests": [
             {"input": ["python"], "expected": "nohtyp"},
             {"input": ["Arjun"], "expected": "nujrA"},
+        ],
+        "hidden_tests": [
             {"input": ["12345"], "expected": "54321"},
+            {"input": [""], "expected": ""},
+        ],
+    },
+    "count-vowels": {
+        "title": "Count Vowels",
+        "description": "Write solve(text) and return the number of vowels in the string.",
+        "function_name": "solve",
+        "starter_code": "def solve(text):\n    # count a, e, i, o, u in the given string\n    pass\n",
+        "visible_tests": [
+            {"input": ["education"], "expected": 5},
+            {"input": ["sky"], "expected": 0},
+        ],
+        "hidden_tests": [
+            {"input": ["algorithm"], "expected": 3},
+            {"input": ["AEIOU"], "expected": 5},
         ],
     },
 }
@@ -54,7 +76,7 @@ print(json.dumps({"result": result}))
 
 def evaluate_submission(challenge_id, code):
     challenge = CHALLENGES[challenge_id]
-    tests = challenge["tests"]
+    tests = challenge["visible_tests"] + challenge["hidden_tests"]
     function_name = challenge["function_name"]
     results = []
     temp_root = Path(__file__).resolve().parent / ".judge_tmp"
@@ -68,7 +90,8 @@ def evaluate_submission(challenge_id, code):
         submission_path.write_text(code, encoding="utf-8")
         runner_path.write_text(RUNNER_TEMPLATE, encoding="utf-8")
 
-        for test in tests:
+        for index, test in enumerate(tests):
+            is_visible = index < len(challenge["visible_tests"])
             try:
                 completed = subprocess.run(
                     [
@@ -86,36 +109,34 @@ def evaluate_submission(challenge_id, code):
                 )
             except subprocess.TimeoutExpired:
                 results.append(
-                    {
-                        "input": test["input"],
-                        "expected": test["expected"],
-                        "passed": False,
-                        "error": "Time limit exceeded",
-                    }
+                    _failure_result(
+                        test=test,
+                        is_visible=is_visible,
+                        error="Time limit exceeded",
+                    )
                 )
                 continue
 
             if completed.returncode != 0:
                 results.append(
-                    {
-                        "input": test["input"],
-                        "expected": test["expected"],
-                        "passed": False,
-                        "error": completed.stderr.strip() or "Execution failed",
-                    }
+                    _failure_result(
+                        test=test,
+                        is_visible=is_visible,
+                        error=completed.stderr.strip() or "Execution failed",
+                    )
                 )
                 continue
 
             payload = json.loads(completed.stdout.strip())
             actual = payload["result"]
-            results.append(
-                {
-                    "input": test["input"],
-                    "expected": test["expected"],
-                    "actual": actual,
-                    "passed": actual == test["expected"],
-                }
-            )
+            result = {
+                "visible": is_visible,
+                "input": test["input"] if is_visible else "<hidden>",
+                "expected": test["expected"] if is_visible else "<hidden>",
+                "actual": actual if is_visible else "<hidden>",
+                "passed": actual == test["expected"],
+            }
+            results.append(result)
 
     passed = sum(1 for item in results if item["passed"])
     total = len(results)
@@ -124,4 +145,14 @@ def evaluate_submission(challenge_id, code):
         "passed_tests": passed,
         "total_tests": total,
         "results": results,
+    }
+
+
+def _failure_result(test, is_visible, error):
+    return {
+        "visible": is_visible,
+        "input": test["input"] if is_visible else "<hidden>",
+        "expected": test["expected"] if is_visible else "<hidden>",
+        "passed": False,
+        "error": error,
     }

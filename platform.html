@@ -10,11 +10,61 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
+		<style>
+			.challenge-card, .stats-card {
+				border: solid 1px rgba(210, 215, 217, 0.75);
+				border-radius: 0.375em;
+				padding: 1.5em;
+				margin-bottom: 1.5em;
+			}
+
+			.challenge-card.active {
+				border-color: #f56a6a;
+				box-shadow: 0 0 0 1px rgba(245, 106, 106, 0.2);
+			}
+
+			.status-pill {
+				display: inline-block;
+				padding: 0.2em 0.8em;
+				border-radius: 999px;
+				font-size: 0.8em;
+				font-weight: 700;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+			}
+
+			.status-pill.accepted {
+				background: rgba(57, 181, 74, 0.12);
+				color: #2d8a3b;
+			}
+
+			.status-pill.failed {
+				background: rgba(245, 106, 106, 0.12);
+				color: #d14c4c;
+			}
+
+			.code-box, .result-box {
+				background: #2f3338;
+				color: #f3f4f6;
+				border-radius: 0.375em;
+				padding: 1.25em;
+				font-family: Consolas, Monaco, monospace;
+				overflow-x: auto;
+			}
+
+			.history-item {
+				border-top: solid 1px rgba(210, 215, 217, 0.75);
+				padding: 1.25em 0;
+			}
+
+			.history-item:first-child {
+				border-top: 0;
+				padding-top: 0;
+			}
+		</style>
 	</head>
 	<body class="is-preload">
-
 		<div id="wrapper">
-
 			<div id="main">
 				<div class="inner">
 
@@ -31,88 +81,83 @@
 					<section id="banner">
 						<div class="content">
 							<header>
-								<h1>Practice Python like a coding platform</h1>
-								<p>Students submit code, the backend runs test cases, and every result is stored for later use.</p>
+								<h1>Python practice platform for students</h1>
+								<p>Students identify themselves, solve challenges, get evaluated automatically, and build a submission history you can analyze later.</p>
 							</header>
-							<p>This page is the frontend prototype for a HackerRank-style flow. The actual evaluation happens in the Python backend added to this repo. For now it supports trusted local development, not public internet-safe code execution.</p>
-							<ul class="actions">
-								<li><a href="#submission-form" class="button big">Try A Submission</a></li>
-							</ul>
+							<p>This page is now a working MVP frontend. Once the Flask backend is running, students can log in with name and email, pick a challenge, submit Python code, and review their previous attempts.</p>
 						</div>
 						<span class="image object">
-							<img src="images/pic10.jpg" alt="Python coding challenge" />
+							<img src="images/pic10.jpg" alt="Python coding platform" />
 						</span>
 					</section>
 
 					<section>
 						<header class="major">
-							<h2>How This Prototype Works</h2>
+							<h2>1. Student Login</h2>
 						</header>
-						<div class="features">
-							<article>
-								<span class="icon solid fa-keyboard"></span>
-								<div class="content">
-									<h3>Student Submission</h3>
-									<p>The student enters a name, picks a challenge, and writes Python code that implements the required function.</p>
+						<form id="student-form">
+							<div class="row gtr-uniform">
+								<div class="col-5 col-12-xsmall">
+									<input type="text" id="student-name" placeholder="Student name" required />
 								</div>
-							</article>
-							<article>
-								<span class="icon solid fa-vial"></span>
-								<div class="content">
-									<h3>Test Case Evaluation</h3>
-									<p>The backend runs the code against test cases with a timeout and returns pass or fail details for each case.</p>
+								<div class="col-5 col-12-xsmall">
+									<input type="email" id="student-email" placeholder="Student email" required />
 								</div>
-							</article>
-							<article>
-								<span class="icon solid fa-database"></span>
-								<div class="content">
-									<h3>Submission Storage</h3>
-									<p>Each result is saved into a JSONL file so you can later analyze attempts, accuracy, and student progress.</p>
+								<div class="col-2 col-12-xsmall">
+									<button type="submit" class="primary fit">Start</button>
 								</div>
-							</article>
-							<article>
-								<span class="icon solid fa-cloud"></span>
-								<div class="content">
-									<h3>Future Data Export</h3>
-									<p>You can later sync the saved data to Google Drive, Sheets, or a real database after the judging flow is stable.</p>
+							</div>
+						</form>
+						<p id="student-summary">No student session yet.</p>
+					</section>
+
+					<section>
+						<header class="major">
+							<h2>2. Platform Stats</h2>
+						</header>
+						<div class="row">
+							<div class="col-4 col-12-medium">
+								<div class="stats-card">
+									<h3>Total Submissions</h3>
+									<p id="stat-submissions">0</p>
 								</div>
-							</article>
+							</div>
+							<div class="col-4 col-12-medium">
+								<div class="stats-card">
+									<h3>Accepted Submissions</h3>
+									<p id="stat-accepted">0</p>
+								</div>
+							</div>
+							<div class="col-4 col-12-medium">
+								<div class="stats-card">
+									<h3>Solved Challenges</h3>
+									<p id="stat-solved">0</p>
+								</div>
+							</div>
 						</div>
 					</section>
 
 					<section>
 						<header class="major">
-							<h2>Sample Challenges</h2>
+							<h2>3. Choose A Challenge</h2>
 						</header>
-						<div class="posts">
-							<article>
-								<h3>Sum Two Numbers</h3>
-								<p>Write a function named <code>solve(a, b)</code> that returns the sum of two integers.</p>
-							</article>
-							<article>
-								<h3>Reverse A String</h3>
-								<p>Write a function named <code>solve(text)</code> that returns the reversed string.</p>
-							</article>
-						</div>
+						<div id="challenge-list" class="posts"></div>
 					</section>
 
-					<section id="submission-form">
+					<section>
 						<header class="major">
-							<h2>Submit Python Code</h2>
+							<h2>4. Write Python Code</h2>
 						</header>
+						<div class="challenge-card">
+							<h3 id="selected-title">Select a challenge</h3>
+							<p id="selected-description">Challenge details will appear here.</p>
+							<p><strong>Expected function:</strong> <span id="selected-function">solve</span></p>
+							<div id="visible-tests"></div>
+						</div>
 						<form id="judge-form">
 							<div class="row gtr-uniform">
-								<div class="col-6 col-12-xsmall">
-									<input type="text" name="student_name" id="student_name" placeholder="Student name" required />
-								</div>
-								<div class="col-6 col-12-xsmall">
-									<select name="challenge_id" id="challenge_id">
-										<option value="sum-two-numbers">Sum Two Numbers</option>
-										<option value="reverse-string">Reverse A String</option>
-									</select>
-								</div>
 								<div class="col-12">
-									<textarea name="code" id="code" rows="14" placeholder="def solve(a, b):&#10;    return a + b" required></textarea>
+									<textarea id="code" rows="16" class="code-box" placeholder="def solve(...):&#10;    pass" required></textarea>
 								</div>
 								<div class="col-12">
 									<ul class="actions">
@@ -121,25 +166,32 @@
 								</div>
 							</div>
 						</form>
-						<pre id="result-box">Backend not called yet. Start the local API in the backend folder, then submit code here.</pre>
+						<pre id="result-box" class="result-box">Login, choose a challenge, and submit code to see results here.</pre>
 					</section>
 
 					<section>
 						<header class="major">
-							<h2>Before You Deploy Publicly</h2>
+							<h2>5. Submission History</h2>
 						</header>
-						<p>Do not expose this prototype directly on the internet yet. Running arbitrary Python from untrusted students requires containers, sandboxing, CPU and memory limits, filesystem isolation, and stronger auth than a local demo backend.</p>
+						<div id="history-list">
+							<p>No submissions yet.</p>
+						</div>
 					</section>
 
+					<section>
+						<header class="major">
+							<h2>Deployment Note</h2>
+						</header>
+						<p>This frontend can stay on GitHub Pages, but the backend must run on a Python hosting service like Render, Railway, or another server. For a real public judge, code execution must move into isolated containers before you allow untrusted student submissions.</p>
+					</section>
 				</div>
 			</div>
 
 			<div id="sidebar">
 				<div class="inner">
-
 					<section id="search" class="alt">
 						<form method="post" action="#">
-							<input type="text" name="query" id="query" placeholder="Search challenges" />
+							<input type="text" placeholder="Search challenges" />
 						</form>
 					</section>
 
@@ -163,13 +215,13 @@
 						</header>
 						<div class="mini-posts">
 							<article>
-								<p>1. Install Python dependencies from <code>backend/requirements.txt</code>.</p>
+								<p>1. Install backend packages from <code>backend/requirements.txt</code>.</p>
 							</article>
 							<article>
-								<p>2. Run <code>python app.py</code> inside the <code>backend</code> folder.</p>
+								<p>2. Run <code>python app.py</code> inside <code>backend</code>.</p>
 							</article>
 							<article>
-								<p>3. Submissions will be stored in <code>backend/data/submissions.jsonl</code>.</p>
+								<p>3. Set <code>window.JUDGE_API_BASE</code> later when you host the backend remotely.</p>
 							</article>
 						</div>
 					</section>
@@ -184,14 +236,8 @@
 							<li class="icon brands fa-linkedin"><a href="#">LinkedIn profile</a></li>
 						</ul>
 					</section>
-
-					<footer id="footer">
-						<p class="copyright">&copy; Arjun Singh Gangwar. Built on Editorial by <a href="https://html5up.net">HTML5 UP</a>.</p>
-					</footer>
-
 				</div>
 			</div>
-
 		</div>
 
 		<script src="assets/js/jquery.min.js"></script>
@@ -200,36 +246,224 @@
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
 		<script>
-			const form = document.getElementById('judge-form');
-			const resultBox = document.getElementById('result-box');
+			const API_BASE = window.JUDGE_API_BASE || 'http://127.0.0.1:5000';
+			const STORAGE_KEY = 'judgeStudentSession';
 
-			form.addEventListener('submit', async function (event) {
+			const studentForm = document.getElementById('student-form');
+			const judgeForm = document.getElementById('judge-form');
+			const studentSummary = document.getElementById('student-summary');
+			const resultBox = document.getElementById('result-box');
+			const challengeList = document.getElementById('challenge-list');
+			const historyList = document.getElementById('history-list');
+			const visibleTests = document.getElementById('visible-tests');
+
+			const selectedTitle = document.getElementById('selected-title');
+			const selectedDescription = document.getElementById('selected-description');
+			const selectedFunction = document.getElementById('selected-function');
+			const codeBox = document.getElementById('code');
+
+			const statSubmissions = document.getElementById('stat-submissions');
+			const statAccepted = document.getElementById('stat-accepted');
+			const statSolved = document.getElementById('stat-solved');
+
+			let challenges = [];
+			let selectedChallenge = null;
+			let currentStudent = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+
+			function setStats(stats) {
+				statSubmissions.textContent = stats ? stats.total_submissions : '0';
+				statAccepted.textContent = stats ? stats.accepted_submissions : '0';
+				statSolved.textContent = stats ? stats.solved_challenges : '0';
+			}
+
+			function setStudentSummary() {
+				if (!currentStudent) {
+					studentSummary.textContent = 'No student session yet.';
+					setStats(null);
+					return;
+				}
+
+				studentSummary.textContent = 'Logged in as ' + currentStudent.student.name + ' (' + currentStudent.student.email + ')';
+				setStats(currentStudent.stats);
+			}
+
+			function renderVisibleTests(tests) {
+				visibleTests.innerHTML = '<h4>Visible test cases</h4>';
+				tests.forEach(function (test, index) {
+					const block = document.createElement('div');
+					block.className = 'challenge-card';
+					block.innerHTML = '<strong>Test ' + (index + 1) + '</strong><br>Input: <code>' +
+						JSON.stringify(test.input) + '</code><br>Expected: <code>' +
+						JSON.stringify(test.expected) + '</code>';
+					visibleTests.appendChild(block);
+				});
+			}
+
+			function renderChallenges() {
+				challengeList.innerHTML = '';
+				challenges.forEach(function (challenge) {
+					const article = document.createElement('article');
+					article.className = 'challenge-card' + (selectedChallenge && selectedChallenge.id === challenge.id ? ' active' : '');
+					article.innerHTML = '<h3>' + challenge.title + '</h3>' +
+						'<p>' + challenge.description + '</p>' +
+						'<p><strong>Function:</strong> <code>' + challenge.function_name + '</code></p>' +
+						'<ul class="actions"><li><button class="button">Solve</button></li></ul>';
+					article.querySelector('button').addEventListener('click', function () {
+						selectChallenge(challenge.id);
+					});
+					challengeList.appendChild(article);
+				});
+			}
+
+			function selectChallenge(challengeId) {
+				selectedChallenge = challenges.find(function (item) {
+					return item.id === challengeId;
+				});
+
+				if (!selectedChallenge) {
+					return;
+				}
+
+				selectedTitle.textContent = selectedChallenge.title;
+				selectedDescription.textContent = selectedChallenge.description;
+				selectedFunction.textContent = selectedChallenge.function_name;
+				codeBox.value = selectedChallenge.starter_code;
+				renderVisibleTests(selectedChallenge.visible_tests);
+				renderChallenges();
+			}
+
+			function renderHistory(submissions) {
+				if (!submissions.length) {
+					historyList.innerHTML = '<p>No submissions yet.</p>';
+					return;
+				}
+
+				historyList.innerHTML = submissions.map(function (item) {
+					return '<div class="history-item">' +
+						'<h3>' + item.challenge_id + '</h3>' +
+						'<p><span class="status-pill ' + item.status + '">' + item.status + '</span></p>' +
+						'<p>Passed ' + item.passed_tests + ' of ' + item.total_tests + ' tests.</p>' +
+						'<p>Submitted at: ' + item.submitted_at + '</p>' +
+						'</div>';
+				}).join('');
+			}
+
+			async function loadChallenges() {
+				const response = await fetch(API_BASE + '/api/challenges');
+				challenges = await response.json();
+				renderChallenges();
+				if (!selectedChallenge && challenges.length) {
+					selectChallenge(challenges[0].id);
+				}
+			}
+
+			async function loadStudentSession() {
+				if (!currentStudent) {
+					setStudentSummary();
+					return;
+				}
+
+				try {
+					const response = await fetch(API_BASE + '/api/students/' + currentStudent.student.id + '/submissions');
+					if (!response.ok) {
+						throw new Error('Student session not found');
+					}
+					const payload = await response.json();
+					currentStudent = {
+						student: payload.student,
+						stats: payload.stats
+					};
+					localStorage.setItem(STORAGE_KEY, JSON.stringify(currentStudent));
+					setStudentSummary();
+					renderHistory(payload.submissions);
+				} catch (error) {
+					currentStudent = null;
+					localStorage.removeItem(STORAGE_KEY);
+					setStudentSummary();
+					historyList.innerHTML = '<p>Could not restore previous session.</p>';
+				}
+			}
+
+			studentForm.addEventListener('submit', async function (event) {
 				event.preventDefault();
 
 				const payload = {
-					student_name: document.getElementById('student_name').value,
-					challenge_id: document.getElementById('challenge_id').value,
-					code: document.getElementById('code').value
+					name: document.getElementById('student-name').value.trim(),
+					email: document.getElementById('student-email').value.trim()
 				};
+
+				const response = await fetch(API_BASE + '/api/students/login', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(payload)
+				});
+
+				const result = await response.json();
+				if (!response.ok) {
+					studentSummary.textContent = result.error || 'Could not create session.';
+					return;
+				}
+
+				currentStudent = result;
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(currentStudent));
+				setStudentSummary();
+				renderHistory([]);
+				resultBox.textContent = 'Student session started successfully.';
+			});
+
+			judgeForm.addEventListener('submit', async function (event) {
+				event.preventDefault();
+
+				if (!currentStudent) {
+					resultBox.textContent = 'Please login before submitting code.';
+					return;
+				}
+
+				if (!selectedChallenge) {
+					resultBox.textContent = 'Please choose a challenge first.';
+					return;
+				}
 
 				resultBox.textContent = 'Running test cases...';
 
 				try {
-					const response = await fetch('http://127.0.0.1:5000/api/submissions', {
+					const response = await fetch(API_BASE + '/api/submissions', {
 						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body: JSON.stringify(payload)
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							student_id: currentStudent.student.id,
+							challenge_id: selectedChallenge.id,
+							code: codeBox.value
+						})
 					});
-
 					const result = await response.json();
-					resultBox.textContent = JSON.stringify(result, null, 2);
+
+					if (!response.ok) {
+						resultBox.textContent = result.error || 'Submission failed.';
+						return;
+					}
+
+					currentStudent.stats = result.stats;
+					localStorage.setItem(STORAGE_KEY, JSON.stringify(currentStudent));
+					setStudentSummary();
+					resultBox.textContent = JSON.stringify(result.submission, null, 2);
+
+					const submissionsResponse = await fetch(API_BASE + '/api/students/' + currentStudent.student.id + '/submissions');
+					const submissionsPayload = await submissionsResponse.json();
+					renderHistory(submissionsPayload.submissions);
 				} catch (error) {
-					resultBox.textContent = 'Could not reach the backend. Start the Python API from the backend folder first.\n\n' + error;
+					resultBox.textContent = 'Could not reach backend at ' + API_BASE + '. Start or deploy the Flask API first.\n\n' + error;
 				}
 			});
-		</script>
 
+			(async function init() {
+				try {
+					await loadChallenges();
+					await loadStudentSession();
+				} catch (error) {
+					resultBox.textContent = 'Platform could not load data from backend.\n\n' + error;
+				}
+			})();
+		</script>
 	</body>
 </html>
