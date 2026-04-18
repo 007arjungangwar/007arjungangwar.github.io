@@ -1,4 +1,5 @@
 import json
+import os
 import secrets
 import sqlite3
 from datetime import datetime, timezone
@@ -8,7 +9,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
+DATA_DIR = Path(os.getenv("DATA_DIR", BASE_DIR / "data"))
 DB_PATH = DATA_DIR / "judge.db"
 CODE_ARCHIVE_DIR = DATA_DIR / "code_archive"
 

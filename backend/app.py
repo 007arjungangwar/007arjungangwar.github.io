@@ -1,4 +1,5 @@
 from functools import wraps
+import os
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -43,7 +44,11 @@ except ImportError:
     )
 
 app = Flask(__name__)
-CORS(app)
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "*")
+CORS(
+    app,
+    resources={r"/api/*": {"origins": [item.strip() for item in allowed_origins.split(",") if item.strip()]}},
+)
 init_db(CHALLENGES)
 
 
@@ -227,4 +232,4 @@ def submit_code():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=os.getenv("FLASK_DEBUG", "false").lower() == "true")

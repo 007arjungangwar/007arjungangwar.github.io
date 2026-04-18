@@ -93,6 +93,28 @@ python app.py
 - Export `judge.db` data or sync it into Google Drive manually or with a small script.
 - Upgrade later to PostgreSQL or a managed database if the number of students grows.
 
+## Hosting the backend
+
+The frontend is already on GitHub Pages, but students need this Python API hosted separately.
+
+This repo now includes `render.yaml` for Render deployment.
+
+### Render setup
+
+1. Push this repo to GitHub.
+2. In Render, create a Blueprint or Web Service from the repo.
+3. Render will use:
+   - `rootDir: backend`
+   - `gunicorn wsgi:app`
+   - persistent disk mounted at `/var/data`
+4. After Render gives you a backend URL, update `judge-config.js` in the site root:
+
+```js
+window.JUDGE_API_BASE = "https://your-render-service.onrender.com";
+```
+
+5. Push that one-line change so the GitHub Pages frontend talks to the hosted backend.
+
 ## Recommended next step
 
 Once the product flow feels right, host the Flask API on a Python service and move execution into Docker containers before treating this as a real public exam system.
